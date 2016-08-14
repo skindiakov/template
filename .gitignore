@@ -48,10 +48,7 @@ target/
 build/
 logs/
 
-/*.sql
-/*.json
-/*.txt
-/*.js
+
 web/src/main/webapp/WEB-INF/jetty-web.xml
 .vagrant/
 *.box

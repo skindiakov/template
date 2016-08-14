@@ -8,7 +8,7 @@ lazy val main = (project in file("main")).
   .settings(
     mainClass in Compile := Some("core.App"),
     mainClass in assembly := Some("core.App"),
-    assemblyOutputPath := file("."),
+    assemblyOutputPath in assembly := file("target/app.jar"),
     assemblyJarName in assembly := "app.jar",
     test in assembly := {},
     fork in run := true,
