@@ -1,4 +1,4 @@
-package core.elevator
+package core
 
 import org.slf4j.LoggerFactory
 
