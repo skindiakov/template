@@ -13,10 +13,14 @@ import scala.concurrent.duration.FiniteDuration
   * Created by stas on 07.08.16.
   */
 class Dispatcher extends Actor with Loggable {
+
+  var defaultTask:Option[String] = None
+
   override def receive: Receive = {
-    case AddTask(name, task) =>
-      if (defined(task)) {
-        context.actorOf(task, name = name)
+    case AddTask(name, taskType) =>
+      if (defined(taskType)) {
+        val task = context.actorOf(taskType, name = name)
+        if(defaultTask.isEmpty) defaultTask = Option(task.path.name)
       }
     case AddLink(from, to) =>
       (get(from), get(to)) match {
@@ -25,7 +29,7 @@ class Dispatcher extends Actor with Loggable {
         case _ =>
       }
     case Execute(message, task) =>
-      select(task) ! Envelop(message, sender())
+      select(task.getOrElse(defaultTask.get)) ! Envelop(message, sender())
     case Ping => sender ! Pong
   }
 
@@ -49,13 +53,15 @@ class Dispatcher extends Actor with Loggable {
   }
 }
 
-case class AddTask(name: String, task: String)
+trait Operation
 
-case class AddLink(from: String, to: String)
+case class AddTask(name: String, task: String) extends Operation
 
-case class Execute(message: String, task: String)
+case class AddLink(from: String, to: String) extends Operation
 
-case class LinkTo(ref: ActorRef)
+case class Execute(message: String, task: Option[String]= None) extends Operation
+
+case class LinkTo(ref: ActorRef) extends Operation
 
 object Ping
 

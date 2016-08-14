@@ -22,7 +22,7 @@ class Delay extends Actor with BaseOperation with Loggable {
   override def receive: Receive = {
     case l: LinkTo => noopActor ! l
     case e: Envelop =>
-      context.system.scheduler.scheduleOnce(defaultDuration, noopActor, e)
+      context.system.scheduler.scheduleOnce(defaultDuration, noopActor, e.copy(wasDelayed = true))
 
   }
 }

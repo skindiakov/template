@@ -1,12 +1,12 @@
 package core.task
 
 import akka.actor.{Actor, ActorRef}
-import core.{Envelop, FailedExecution, ShortCircuit}
+import core.{Envelop, FailedExecution, Loggable, ShortCircuit}
 
 /**
   * Created by stas on 14.08.16.
   */
-trait BaseOperation {
+trait BaseOperation extends Loggable {
   own: Actor =>
 
   implicit val defaultContext = scala.concurrent.ExecutionContext.Implicits.global
@@ -15,6 +15,7 @@ trait BaseOperation {
 
   def receive: Receive = {
     case e: Envelop if e.trace.contains(self.path.name) =>
+      log error s"Faced circular dependency. Task is skipped."
       e.initialSender ! FailedExecution(addTrace(e), ShortCircuit)
     case LinkTo(ref) => linkedTo = Option(ref)
     case e: Envelop =>

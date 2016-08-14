@@ -1,10 +1,11 @@
+package core
+
 import java.util.concurrent.TimeUnit
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.pattern.ask
 import akka.util.Timeout
 import core.task._
-import core.{Envelop, FailedExecution}
 import org.scalatest._
 
 import scala.concurrent.duration.FiniteDuration
@@ -18,25 +19,25 @@ class TaskTest extends BaseTaskTest {
 
   test("Echo") {
     dispatcher ! AddTask("echo", "echo")
-    val result = Await.result(dispatcher ? Execute("message", "echo"), duration).asInstanceOf[Envelop]
+    val result = Await.result(dispatcher ? Execute("message", Option("echo")), duration).asInstanceOf[Envelop]
     assert(result.body == "messagemessage")
   }
 
   test("Noop") {
     dispatcher ! AddTask("noop", "noop")
-    val result = Await.result(dispatcher ? Execute("message", "noop"), duration).asInstanceOf[Envelop]
+    val result = Await.result(dispatcher ? Execute("message", Option("noop")), duration).asInstanceOf[Envelop]
     assert(result.body == "message")
   }
 
   test("Reverse") {
     dispatcher ! AddTask("reverse", "reverse")
-    val result = Await.result(dispatcher ? Execute("message", "reverse"), duration).asInstanceOf[Envelop]
+    val result = Await.result(dispatcher ? Execute("message", Option("reverse")), duration).asInstanceOf[Envelop]
     assert(result.body == "message".reverse)
   }
 
   test("Delay") {
     dispatcher ! AddTask("delay", "delay")
-    val result = Await.result(dispatcher ? Execute("message", "delay"), duration).asInstanceOf[Envelop]
+    val result = Await.result(dispatcher ? Execute("message", Option("delay")), duration).asInstanceOf[Envelop]
     assert(result.body == "message")
   }
 
@@ -45,7 +46,7 @@ class TaskTest extends BaseTaskTest {
     dispatcher ! AddTask("reverse", "reverse")
     dispatcher ! AddLink("echo", "reverse")
 
-    val result = Await.result(dispatcher ? Execute("message", "echo"), duration).asInstanceOf[Envelop]
+    val result = Await.result(dispatcher ? Execute("message", Option("echo")), duration).asInstanceOf[Envelop]
     assert(result.body == "messagemessage".reverse)
   }
 
@@ -56,7 +57,7 @@ class TaskTest extends BaseTaskTest {
     dispatcher ! AddLink("reverse", "echo")
     dispatcher ! AddLink("echo", "reverse2")
 
-    val result = Await.result(dispatcher ? Execute("message", "reverse"), duration).asInstanceOf[Envelop]
+    val result = Await.result(dispatcher ? Execute("message", Option("reverse")), duration).asInstanceOf[Envelop]
     assert(result.body == "messagemessage")
   }
 
@@ -66,7 +67,7 @@ class TaskTest extends BaseTaskTest {
     dispatcher ! AddLink("reverse", "echo")
     dispatcher ! AddLink("echo", "reverse")
 
-    val result = Await.result(dispatcher ? Execute("message", "reverse"), duration).asInstanceOf[FailedExecution]
+    Await.result(dispatcher ? Execute("message", Option("reverse")), duration).asInstanceOf[FailedExecution]
   }
 
 }

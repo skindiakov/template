@@ -6,7 +6,11 @@ lazy val main = (project in file("main")).
   configs(IntegrationTest).
   settings(libraryDependencies ++= allDeps)
   .settings(
-    mainClass in Compile := Some("rest.jetty.JettyLauncher"),
+    mainClass in Compile := Some("core.App"),
+    mainClass in assembly := Some("core.App"),
+    assemblyOutputPath := file("."),
+    assemblyJarName in assembly := "app.jar",
+    test in assembly := {},
     fork in run := true,
     javaOptions in run := Seq("-Xmx1G", "-Xss256k", "-XX:+UseCompressedOops")
   )
