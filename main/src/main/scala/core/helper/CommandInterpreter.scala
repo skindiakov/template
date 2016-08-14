@@ -15,6 +15,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
   * Created by stas on 14.08.16.
   */
 class CommandInterpreter(dispatcher: ActorRef) {
+  // Global context is not the best way, but appropriate for test task
   implicit val defaultContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
   val duration: FiniteDuration = FiniteDuration(10, TimeUnit.SECONDS)
   implicit val timeout: Timeout = Timeout(duration)
@@ -35,6 +36,12 @@ class CommandInterpreter(dispatcher: ActorRef) {
         printResponse(lines)
     }
   }
+/*
+  From Task Text:
+  A process statement should leave the network “dry”: no events are left in the network once processing results are printed.
 
+  So println is quite appropriate solution here.
+  Another possibility is to set up logger to log only incomingmessage.
+ */
   def printResponse(response: List[String]) = println(response mkString " ")
 }

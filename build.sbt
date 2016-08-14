@@ -1,6 +1,11 @@
+import java.nio.file.{StandardCopyOption, Files}
+
 import Dependencies._
 
 scalaVersion in Global := "2.11.7"
+
+lazy val copyRes = TaskKey[Unit]("copyRes")
+
 
 lazy val main = (project in file("main")).
   configs(IntegrationTest).
@@ -11,6 +16,13 @@ lazy val main = (project in file("main")).
     assemblyOutputPath in assembly := file("target/app.jar"),
     assemblyJarName in assembly := "app.jar",
     test in assembly := {},
+    copyRes <<= (baseDirectory, target) map {
+      (base, trg) =>
+        val fromFile = new File(base, "../instructions.txt")
+        val toFile = new File(base, "../target/instructions.txt")
+        Files.copy(fromFile.toPath, toFile.toPath, StandardCopyOption.REPLACE_EXISTING)
+    },
+    assembly <<= assembly.dependsOn (copyRes),
     fork in run := true,
     javaOptions in run := Seq("-Xmx1G", "-Xss256k", "-XX:+UseCompressedOops")
   )

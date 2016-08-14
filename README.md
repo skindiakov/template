@@ -4,13 +4,25 @@ To start project you need:
     sbt
 
 
-To start project and insert data in interactive mode run command: sbt run
+To run tests use command 
 
-To read data from a file use command:
+    sbt test
 
-     sbt "main/run fileName"
+To build and packag project from sources use command
+
+    sbt assembly
+
+SBT will build thea an app.jar file and put it into folder '/target'
+also it will copy there default test file 'instructions.txt'
+To run program enter folder '/target' and use command
+
+    java -jar app.jar instructions.txt
+
+    
+Assumptions used in task:
+
+I decided to use AKKA for distributed system nodes.
+Actors communicate via standard sending of messages, 
+if needed it is possible to implement another communication mechanism via REST, RabbitMQ or other.
 
 
-For example to ran with test file customers.txt use command
-
-    sbt "main/run instructions.txt"
